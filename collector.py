@@ -90,10 +90,6 @@ def create_app(import_name, conf):
                 "time": now,
                 "ip": ip
             }
-            print("user="+user[0])
-            print("password="+password[0])
-            print("time="+now)
-            print("address="+format(ip))
             app.add_to_db(data)
             return print_page("webassets/wrong_login.html")
         except IOError:
