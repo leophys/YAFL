@@ -1,6 +1,6 @@
-===
+============================
 YAFL: Yet Another Fake Login
-===
+============================
 
 Welcome to another purposeless fake login web application. It is a useful way to
 learn Flask and could in principle be used to collect credential from an hostile
