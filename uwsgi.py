@@ -5,10 +5,10 @@ conf = {
     "port": 8081,
     "db_path": "default_db.json"
 }
-app = create_app("wsgi_collector", conf)
+yafl = create_app("wsgi_collector", conf)
 
 if __name__ == "__main__":
-    app.run(
+    yafl.run(
         host = conf['addresses'],
         port = int(conf['port'])
     )
