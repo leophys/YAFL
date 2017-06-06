@@ -1,12 +1,12 @@
 from flask import Flask,request
-from FLexceptions import PostError, UnknownError, ConfigError
+from FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
 from datetime import datetime
 from tinydb import TinyDB
 from os import getcwd, path
 #from sys import stderr
 #import sys
 
-pwd= getcwd()
+pwd = getcwd()
 separator = path.sep
 debug_flag = False
 
@@ -30,7 +30,7 @@ class Collector(Flask):
 
     def init_db(self):
         try:
-            self.db = TinyDB(pwd+separator+conf['db_path'])
+            self.db = TinyDB(pwd+separator+self.db_path)
             print("[Collector]: db init'd")
         except IOError:
             print("[Collector]: db init failed")#, file = sys.stderr)
@@ -54,7 +54,7 @@ class Collector(Flask):
             raise DBInsertError
 
 def create_app(import_name, conf):
-    app = Collector(import_name, conf)
+    app = Collector(import_name, conf={'addresses': '127.0.0.1', 'port': 6666, 'db_path': 'default_db.json'})
     app.init_db()
 
     @app.route("/")
