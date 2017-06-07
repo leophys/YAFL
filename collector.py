@@ -1,12 +1,12 @@
 from flask import Flask,request
-from FLexceptions import PostError, UnknownError, ConfigError
+from FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
 from datetime import datetime
 from tinydb import TinyDB
 from os import getcwd, path
 #from sys import stderr
 #import sys
 
-pwd= getcwd()
+pwd = getcwd()
 separator = path.sep
 debug_flag = False
 
@@ -23,14 +23,12 @@ def print_page(page_path):
 class Collector(Flask):
     def __init__(self, import_name, conf):
         super(Collector, self).__init__(import_name)
-        self.add = conf['addresses']
-        self.port = conf['port']
         self.db_path = conf['db_path']
         self.db = None
 
     def init_db(self):
         try:
-            self.db = TinyDB(pwd+separator+conf['db_path'])
+            self.db = TinyDB(self.db_path)
             print("[Collector]: db init'd")
         except IOError:
             print("[Collector]: db init failed")#, file = sys.stderr)
@@ -53,8 +51,8 @@ class Collector(Flask):
         except:
             raise DBInsertError
 
-def create_app(import_name, conf):
-    app = Collector(import_name, conf)
+def create_app(import_name, config={'db_path': 'default_db.json'}):
+    app = Collector(import_name, conf=config)
     app.init_db()
 
     @app.route("/")
@@ -99,15 +97,3 @@ def create_app(import_name, conf):
             raise PostError
 
     return app
-
-if __name__ == "__main__":
-    conf = {
-        "addresses": "0.0.0.0",
-        "port": 5003,
-        "db_path": "default_db.json"
-    }
-    app = create_app("test_collector", conf)
-    app.run(
-        host = conf['addresses'],
-        port = int(conf['port'])
-    )
