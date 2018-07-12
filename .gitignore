@@ -4,3 +4,4 @@ __pycache__
 default_db.json
 venv
 dummy
+*.egg*/
