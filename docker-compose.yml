@@ -1,0 +1,22 @@
+version: "3.6"
+services:
+    webserver:
+        image: yafl/webserver:latest
+        build:
+            context: .
+            dockerfile: docker/Dockerfile-webserver
+            args:
+                UID: "1000"
+        ports:
+            - "80:80"
+
+    yafl:
+        image: yafl/app:latest
+        build:
+            context: .
+            dockerfile: docker/Dockerfile-app
+        volumes:
+            - log:/log
+
+volumes:
+    log:

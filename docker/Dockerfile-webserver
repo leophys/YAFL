@@ -1,0 +1,5 @@
+FROM nginx:latest
+
+COPY ./docker/utils/yafl.conf /etc/nginx/sites-available/yafl.conf
+RUN  mkdir /etc/nginx/sites-enabled \
+ && ln -s /etc/nginx/sites-available/yafl.conf /etc/nginx/sites-enabled/yafl.conf

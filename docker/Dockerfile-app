@@ -1,0 +1,19 @@
+FROM python:3.7
+
+ARG UID="1000"
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN useradd -m -u $UID johndoe \
+    && mkdir /home/johndoe/app \
+    && chown -R johndoe /home/johndoe/app \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends uwsgi \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+COPY . /home/johndoe/app/
+USER johndoe
+WORKDIR /home/johndoe/app
+RUN  python3 -m venv yafl_ve \
+ && yafl_ve/bin/pip3 install -e .
+
+ENTRYPOINT ["/usr/bin/uwsgi", "--ini","YAFL.ini"]
