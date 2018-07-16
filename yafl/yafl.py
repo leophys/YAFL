@@ -2,7 +2,7 @@
 
 import click
 
-from collector import create_app
+from yafl.collector import create_app
 
 
 @click.command()

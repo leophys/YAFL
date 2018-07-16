@@ -3,9 +3,10 @@ import datetime
 import pkg_resources
 
 from flask import Flask, request
-from FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
-
 from tinydb import TinyDB
+
+from yafl.FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
+
 
 
 def print_page(page_path):
@@ -48,7 +49,7 @@ class Collector(Flask):
             raise DBInsertError
 
 
-def create_app(import_name, config={'db_path': 'default_db.json'}):
+def create_app(import_name="default_app", config={'db_path': 'default_db.json'}):
     app = Collector(import_name, conf=config)
     app.init_db()
 
