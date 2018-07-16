@@ -1,0 +1,5 @@
+uwsgi:
+    uid: johndoe
+    gid: johndoe
+    virtualenv: %d../../yafl_ve
+    emperor: %d/app

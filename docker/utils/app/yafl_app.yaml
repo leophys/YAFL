@@ -1,0 +1,15 @@
+uwsgi:
+    plugins: python3
+    uid: johndoe
+    gid: johndoe
+    http: :8000
+    socket: :8001
+    stats: :1717
+    master: 1
+    workers: 2
+    chdir: /home/johndoe/app
+    pythonpath: /home/johndoe/yafl_ve/lib
+    #virtualenv: /home/johndoe/yafl_ve
+    pyimport: yafl
+    module: yafl.uwsgi_mod
+    callable: yafl

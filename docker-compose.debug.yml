@@ -1,0 +1,12 @@
+version: "3.6"
+services:
+    yafl:
+        volumes:
+            - .:/home/johndoe/app
+        ports:
+            - "8000:8000"
+            - "8001:8001"
+            - "1717:1717"
+    webserver:
+        volumes:
+            - ./docker/utils/yafl.conf:/etc/nginx/conf.d/yafl.conf

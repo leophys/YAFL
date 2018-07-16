@@ -3,17 +3,24 @@ FROM python:3.7
 ARG UID="1000"
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV WHEELHOUSE=/home/johndoe/app/.wheelhouse
+ENV PIP_FIND_LINKS=$WHEELHOUSE
+ENV PIP_WHEEL_DIR=$WHEELHOUSE
 
 RUN useradd -m -u $UID johndoe \
     && mkdir /home/johndoe/app \
+    && mkdir /home/johndoe/.wheelhouse \
     && chown -R johndoe /home/johndoe/app \
     && apt-get update \
-    && apt-get install -y --no-install-recommends uwsgi \
+    && apt-get install -y --no-install-recommends uwsgi uwsgi-plugin-python3 \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-COPY . /home/johndoe/app/
 USER johndoe
-WORKDIR /home/johndoe/app
-RUN  python3 -m venv yafl_ve \
- && yafl_ve/bin/pip3 install -e .
+WORKDIR /home/johndoe
+COPY requirements.txt /home/johndoe/
+RUN python3 -m venv yafl_ve \
+ && yafl_ve/bin/pip3 install -r requirements.txt
+COPY . /home/johndoe/app/
+RUN yafl_ve/bin/pip3 install -e app/
+USER root
 
-ENTRYPOINT ["/usr/bin/uwsgi", "--ini","YAFL.ini"]
+ENTRYPOINT ["/usr/bin/uwsgi", "--yml","app/docker/utils/YAFL.yaml"]
