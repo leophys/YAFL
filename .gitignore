@@ -7,3 +7,5 @@ dummy
 *.egg*/
 overlay
 .wheelhouse
+build
+dist
