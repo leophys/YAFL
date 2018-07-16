@@ -5,3 +5,5 @@ default_db.json
 venv
 dummy
 *.egg*/
+overlay
+.wheelhouse
