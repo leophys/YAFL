@@ -7,6 +7,7 @@ name = "pypi"
 ipython = "*"
 
 [dev-packages]
+wheel = "*"
 
 [requires]
 python_version = "3.6"
