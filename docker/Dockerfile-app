@@ -12,7 +12,7 @@ RUN useradd -m -u $UID johndoe \
     && mkdir /home/johndoe/.wheelhouse \
     && chown -R johndoe /home/johndoe/app \
     && apt-get update \
-    && apt-get install -y --no-install-recommends uwsgi uwsgi-plugin-python3 \
+    && apt-get install -y --no-install-recommends build-essential python-dev \
  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 USER johndoe
 WORKDIR /home/johndoe
@@ -21,7 +21,6 @@ RUN python3 -m venv yafl_ve \
  && yafl_ve/bin/pip3 install -r requirements.txt
 COPY . /home/johndoe/app/
 RUN yafl_ve/bin/pip3 install -e app/
-COPY uwsgi.d/yafl_app.yaml .
-USER root
+COPY utils/uwsgi/YAFL_standalone.yaml .
 
-ENTRYPOINT ["/usr/bin/uwsgi", "--yml","app/YAFL_emperor.yaml"]
+ENTRYPOINT ["/home/johndoe/yafl_ve/bin/uwsgi", "--yml", "app/utils/uwsgi/YAFL_standalone.yaml"]

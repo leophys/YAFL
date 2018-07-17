@@ -1,6 +1,5 @@
 uwsgi:
     uid: johndoe
     gid: johndoe
-    virtualenv: %d../yafl_ve
-    emperor: %d../
+    emperor: uwsgi.d
     enable-threads: true

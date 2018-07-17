@@ -3,11 +3,8 @@ services:
     yafl:
         volumes:
             - .:/home/johndoe/app
-            - ./YAFL_emperor.yaml:/home/johndoe/YAFL_emperor.yaml
-            - ./uwsgi.d/yafl_app.yaml:/home/johndoe/yafl_app.yaml
         ports:
             - "8000:8000"
-            - "8001:8001"
             - "1717:1717"
     webserver:
         volumes:

@@ -1,0 +1,8 @@
+uwsgi:
+    uid: johndoe
+    gid: johndoe
+    socket: :8001
+    http: :8000
+    plugins: python3
+    module: yafl.uwsgi_mod
+    callable: yafl

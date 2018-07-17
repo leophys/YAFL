@@ -7,7 +7,5 @@ uwsgi:
     stats: :1717
     master: 1
     workers: 2
-    chdir: %d
-    virtualenv: yafl_ve
     module: yafl.uwsgi_mod
     callable: yafl
