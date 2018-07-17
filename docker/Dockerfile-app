@@ -21,6 +21,7 @@ RUN python3 -m venv yafl_ve \
  && yafl_ve/bin/pip3 install -r requirements.txt
 COPY . /home/johndoe/app/
 RUN yafl_ve/bin/pip3 install -e app/
+COPY uwsgi.d/yafl_app.yaml .
 USER root
 
-ENTRYPOINT ["/usr/bin/uwsgi", "--yml","app/docker/utils/YAFL.yaml"]
+ENTRYPOINT ["/usr/bin/uwsgi", "--yml","app/YAFL_emperor.yaml"]

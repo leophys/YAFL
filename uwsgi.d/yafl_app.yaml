@@ -7,9 +7,7 @@ uwsgi:
     stats: :1717
     master: 1
     workers: 2
-    chdir: /home/johndoe/app
-    pythonpath: /home/johndoe/yafl_ve/lib
-    #virtualenv: /home/johndoe/yafl_ve
-    pyimport: yafl
+    chdir: %d
+    virtualenv: yafl_ve
     module: yafl.uwsgi_mod
     callable: yafl
