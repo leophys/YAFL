@@ -22,7 +22,7 @@ You can use setuptools to install in a virtualenv all the dependencies
 
 .. code:: bash
 
- $ virtualenv -p $(which python3) --no-site-packages venv
+ $ python3 -m venv venv
  $ . ./venv/bin/activate
  (venv)$ pip install .
 
@@ -35,25 +35,29 @@ You will find the `yafl` script in your PATH
  Usage: yafl [OPTIONS]
 
  Options:
-   -a, --address TEXT  Address to bind. Defaults to 127.0.0.1
-   -p, --port INTEGER  Port to bind to. Defaults to 8081
-   -l, --log TEXT      Path to log file. Defaults to ./default_db.json
-   --help              Show this message and exit.
+   -a, --address TEXT    Address to bind. Defaults to 127.0.0.1
+   -p, --port INTEGER    Port to bind to. Defaults to 8081
+   -o, --output TEXT     Path to log file. Defaults to /tmp/cli_db.json
+   --debug / --no-debug  Toggles debug (verbose output)
+   --help                Show this message and exit.
+
 
 uwsgi+nginx
-------------------
+-----------
 
-If you plan to run YAFL in production, I suggest to use uwsgi behind an nginx
+If you plan to run YAFL in production, I suggest to use uWSGI behind an nginx
 instance. You can place the YAFL directory wherever it is practical to run it
-for you and install the dipendencies systemwide.
-You can use YAFL.ini to start uwsgi manually, but I suggest to use the systemd unit that comes with uwsgi. You have to place it in `/etc/uwsgi/YAFL.ini` and start uwsgi with
+for you and install the dependencies systemwide.
 
 .. code:: bash
 
-  $ sudo systemctl start uwsgi@YAFL
+    $ cd path/to/yafl
+    $ sudo pip install .
 
-Then you can use the
-following example to nginx, for example using the following and
+You can use ``utils/uwsgi/YAFL_emperor.yaml`` to start uWSGI manually in emperor mode
+(but I suggest to use a systemd unit), placing ``utils/uwsgi/uwsgi.d/yafl_app.yaml``
+in ``/etc/uwsgi.d/``.
+Then you can use the following example to nginx, for example using the following and
 placing it in `/etc/nginx/sites-available/yafl`
 
 .. code::
@@ -76,6 +80,23 @@ and then symlinking
 
   $ sudo ln -s /etc/nginx/sites-available/yafl /etc/nginx/sites-enabled/yafl
   $ sudo systemctl start nginx
+
+
+Development with docker-compose
+-------------------------------
+
+I use docker a lot. This project ships also a ``docker-compose.yaml`` file to be used with
+to develop locally. Just
+
+.. code:: bash
+
+    $ docker-compose build
+    $ docker-compose up
+
+And you should find the app exposed on ``localhost``. Be aware that port 80 on localhost must
+not be used by another program.
+The app is mounted and installed inside the docker container. Therefore, you may develop and see
+the changes in real time.
 
 
 LICENCE
