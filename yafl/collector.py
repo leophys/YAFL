@@ -1,12 +1,19 @@
 # -*- encoding: utf-8 -*-
+"""
+This is the module that contains the main logic.
+It defines a class called `Collector` that customizes some
+bits of a Flask app (initializing the database, for example),
+and a `create_app` function that adds the routes to the app,
+managing them with the appropriate behaviour.
+Here is also defined a `print_page` function
+"""
 import datetime
 import pkg_resources
 
 from flask import Flask, request
 from tinydb import TinyDB
 
-from yafl.FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
-
+from .FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
 
 
 def print_page(page_path):
@@ -27,9 +34,9 @@ class Collector(Flask):
     def init_db(self):
         try:
             self.db = TinyDB(self.db_path)
-            print("[Collector]: db init'd")
+            self.logger.info("db init'd")
         except IOError:
-            print("[Collector]: db init failed")#, file = sys.stderr)
+            self.logger.error("db init failed")
             raise ConfigError
         except:
             raise UnknownError
@@ -49,8 +56,8 @@ class Collector(Flask):
             raise DBInsertError
 
 
-def create_app(import_name="default_app", config={'db_path': 'default_db.json'}):
-    app = Collector(import_name, conf=config)
+def create_app(import_name="default_app", conf={}):
+    app = Collector(import_name, conf=conf)
     app.init_db()
 
     @app.route("/")
@@ -58,7 +65,7 @@ def create_app(import_name="default_app", config={'db_path': 'default_db.json'})
         try:
             return print_page("webassets/index.html")
         except IOError:
-            print("[Collector]: webassets/index.html not readable")#, file=sys.stderr)
+            app.logger.error("webassets/index.html not readable")
             raise ConfigError
         except:
             raise UnknownError
@@ -68,7 +75,7 @@ def create_app(import_name="default_app", config={'db_path': 'default_db.json'})
         try:
             return print_page("webassets/js/{}".format(jspath))
         except IOError:
-            print("[Collector]: js/{} not readable".format(jspath))#, file=sys.stderr)
+            app.logger.error(" js/{} not readable".format(jspath))
             raise ConfigError
         except:
             raise UnknownError
@@ -89,7 +96,7 @@ def create_app(import_name="default_app", config={'db_path': 'default_db.json'})
             app.add_to_db(data)
             return print_page("webassets/wrong_login.html")
         except IOError:
-            print("[Collector]: webassets/wrong_login.html not readable")
+            app.logger.error("webassets/wrong_login.html not readable")
             raise ConfigError
         except:
             raise PostError

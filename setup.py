@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yafl",
-    version="0.1",
+    version="0.2",
     author="Leonardo Barcaroli",
     url="https://github.com/leophys/YAFL",
     py_modules=['yafl'],
@@ -14,7 +14,11 @@ setup(
         'Flask',
         'tinydb',
         'uwsgi',
-        'Click'
+        'Click',
+        'pyyaml',
+    ],
+    install_test=[
+        'pytest',
     ],
     entry_points='''
         [console_scripts]
