@@ -3,6 +3,7 @@ services:
     yafl:
         volumes:
             - .:/home/johndoe/app
+            - ./utils/yafl.yaml:/etc/yafl.yaml:ro
         ports:
             - "8000:8000"
             - "1717:1717"
