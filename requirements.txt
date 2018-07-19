@@ -9,6 +9,7 @@ flask==1.0.2
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
 markupsafe==1.0           # via jinja2
+pyyaml==3.13
 tinydb==3.9.0.post1
 uwsgi==2.0.17.1
 werkzeug==0.14.1          # via flask
