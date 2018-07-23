@@ -1,6 +1,7 @@
 *.swp
 *.pyc
 __pycache__
+*_cache
 default_db.json
 venv
 dummy

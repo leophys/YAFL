@@ -48,7 +48,7 @@ for config_path in _CONFIG_PATHS:
 
 
 _CONF_KEYS = [
-    ('db_path', '/tmp/yafl_%r.json' % _NOW),
+    ('db_path', '/tmp/yafl_%s.json' % _NOW),
     ('log_level', logging.INFO),
     ('address', '127.0.0.1'),
     ('port', 8081),
