@@ -33,3 +33,13 @@ def test_print_page():
 
     with pytest.raises(IOError):
         collector.print_page('/non/existing/path')
+
+
+def test_Collector():
+    from yafl import conf
+    test_app = collector.Collector('test_collector', conf.CONF)
+
+    assert test_app.name == 'test_collector'
+    assert test_app.db_path == conf.CONF['db_path']
+    assert test_app.db is None
+    assert test_app.logger.level == conf.CONF['log_level']
