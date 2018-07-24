@@ -22,11 +22,6 @@ port: 8090
 EXISTING_CONF = []
 
 
-def create_conf_file(conf_path: str):
-    with open(conf_path, "w") as cf:
-        cf.write(TEST_CONFIG % conf_path)
-
-
 def mock_open(conf_path: str, mode: str="r") -> io.BytesIO:
     if conf_path in EXISTING_CONF:
         return io.BytesIO((TEST_CONFIG % conf_path).encode())
