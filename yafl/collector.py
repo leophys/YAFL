@@ -7,13 +7,20 @@ and a `create_app` function that adds the routes to the app,
 managing them with the appropriate behaviour.
 Here is also defined a `print_page` function
 """
+import collections
 import datetime
+import logging
 import pkg_resources
+import queue
+import sys
 
 from flask import Flask, request
 from tinydb import TinyDB
 
-from .FLexceptions import PostError, UnknownError, ConfigError, DBInsertError
+from yafl.FLexceptions import (
+    PostError, UnknownError, ConfigError, DBInsertError
+)
+from yafl import mailer
 
 
 def print_page(page_path):
@@ -25,11 +32,30 @@ def print_page(page_path):
 
 
 class Collector(Flask):
+    client_timemap = {}
+
     def __init__(self, import_name, conf):
         super(Collector, self).__init__(import_name)
-        self.db_path = conf['db_path']
+        self.db_path = conf['app']['db_path']
+        self.address = conf['app']['address']
+        self.port = conf['app']['port']
         self.db = None
-        self.logger.setLevel(conf['log_level'])
+        self.logger.setLevel(conf['app']['log_level'])
+        if conf['app']['log_level'] <= logging.DEBUG:
+            self.debug = True
+        self.mailer = None
+        if conf['mail'].get('address') is not None:
+            mailconf = conf['mail']
+            if 'event_timeout' in mailconf.keys():
+                self.timeout = mailconf['event_timeout']
+                mailconf.pop('event_timeout')
+            else:
+                self.timeout = datetime.timedelta(minutes=5)
+            # Infinite length queue! To store infinite events.
+            self.queue = queue.Queue(-1)
+            self.mailer = mailer.Mailer(
+                queue=self.queue, daemon=True, **mailconf, logger=self.logger
+            )
 
     def init_db(self):
         try:
@@ -52,8 +78,74 @@ class Collector(Flask):
             }
             self.logger.debug("Just entered: {}".format(entry))
             db.insert(entry)
-        except:
-            raise DBInsertError
+        except Exception as e:
+            raise DBInsertError(e)
+
+    def contact_from_client(self, client_ip):
+        if client_ip not in self.client_timemap.keys():
+            self.client_timemap[client_ip] = collections.namedtuple(
+                'client',
+                ['first_contact', 'last_contact']
+            )
+            self.client_timemap[client_ip].first_contact = datetime.datetime.now()
+        self.client_timemap[client_ip].last_contact = datetime.datetime.now()
+
+    def run(self, *args, **kwargs):
+        if self.mailer:
+            self.logger.debug("Starting the mailer in a separate thread...")
+            self.mailer.start()
+            self.logger.debug("Mailer thread started.")
+        super().run(
+            host=self.address,
+            port=self.port,
+            *args, **kwargs
+        )
+
+    def maybe_send_mail(self, ip):
+        if hasattr(self, 'queue'):
+            if ip not in self.client_timemap.keys():
+                self.logger.debug("Sending first contact mail.")
+                self.queue.put(
+                    ("First contact from {}".format(ip),
+                     ip)
+                )
+                return
+            if self.client_timemap[ip].last_contact - datetime.datetime.now() > self.timeout:
+                self.logger.debug("Revamped interest mail.")
+                self.queue.put(
+                    ("Credentials from {}".format(ip),
+                     ip)
+                )
+            self.logger.debug(
+                "%s - first: %s  last: %s",
+                ip,
+                self.client_timemap[ip].first_contact,
+                self.client_timemap[ip].last_contact
+            )
+        return
+
+
+def get_client_ip(request):
+    """
+    Returns the proper client ip, looking for
+    "X-Forwarded-For"
+    "X-Forwarded-Host"
+    "X-Client-IP"
+    "X-Real-IP"
+    headers first.
+    """
+    headers = dict(
+        (h.lower(), h_value) for h, h_value in request.headers.items()
+    )
+    if 'x-forwarded-for' in headers:
+        return headers['x-forwarded-for']
+    if 'x-forwarded-host' in headers:
+        return headers['x-forwarded-host']
+    if 'x-client-ip' in headers:
+        return headers['x-client-ip']
+    if 'x-real-ip' in headers:
+        return headers['x-real-ip']
+    return request.remote_addr
 
 
 def create_app(import_name="default_app", conf={}):
@@ -88,7 +180,7 @@ def create_app(import_name="default_app", conf={}):
             user = request.form.getlist('u')
             password = request.form.getlist('p')
             now = format(datetime.datetime.now())
-            ip = request.remote_addr
+            ip = get_client_ip(request)
             data = {
                 "user": user,
                 "password": password,
@@ -96,11 +188,14 @@ def create_app(import_name="default_app", conf={}):
                 "ip": ip
             }
             app.add_to_db(data)
+            app.maybe_send_mail(ip)
+            app.contact_from_client(ip)
             return print_page("webassets/wrong_login.html")
         except IOError:
             app.logger.error("webassets/wrong_login.html not readable")
             raise ConfigError
-        except:
-            raise PostError
+        except Exception as e:
+            app.logger.error("PostError: %s", e)
+            raise PostError(e)
 
     return app
