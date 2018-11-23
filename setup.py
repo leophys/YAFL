@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="yafl",
-    version="0.2",
+    version="0.3",
     author="Leonardo Barcaroli",
     url="https://github.com/leophys/YAFL",
     py_modules=['yafl'],
