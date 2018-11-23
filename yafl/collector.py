@@ -38,8 +38,8 @@ class Collector(Flask):
         except IOError:
             self.logger.error("db init failed")
             raise ConfigError
-        except:
-            raise UnknownError
+        except Exception as e:
+            raise UnknownError(e)
 
     def add_to_db(self, data):
         try:
@@ -67,8 +67,9 @@ def create_app(import_name="default_app", conf={}):
         except IOError:
             app.logger.error("webassets/index.html not readable")
             raise ConfigError
-        except:
-            raise UnknownError
+        except Exception as e:
+            app.logger.error("UnknownError: %s", e)
+            raise UnknownError(e)
 
     @app.route("/js/<jspath>")
     def js_serve(jspath):
@@ -77,8 +78,9 @@ def create_app(import_name="default_app", conf={}):
         except IOError:
             app.logger.error(" js/{} not readable".format(jspath))
             raise ConfigError
-        except:
-            raise UnknownError
+        except Exception as e:
+            app.logger.error("UnknownError: %s", e)
+            raise UnknownError(e)
 
     @app.route("/login", methods=['POST'])
     def collect():
