@@ -172,9 +172,11 @@ def validate_conf(conf: dict)-> None:
 
 
 def read_conf(filepath: str = None) -> dict:
-    conf = {}
     if filepath:
         conf = load_from_file(filepath)
+        conf['conf_file'] = filepath
+    else:
+        conf = load_from_file()
     conf['app'] = read_section(conf, 'app', DEFAULT_APP_CONF)
     conf['mail'] = read_section(conf, 'mail', DEFAULT_MAIL_CONF)
     return validate_conf(conf)
