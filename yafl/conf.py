@@ -82,8 +82,8 @@ def load_from_file(filepath: str = None) -> dict:
 def read_section(conf: dict, section: str, default: dict) -> dict:
     """
     Composes a section of the conf dictionary. Follows the order:
-        - configuration file
         - env variable
+        - configuration file
         - default
     Returns the specified section only.
     """
