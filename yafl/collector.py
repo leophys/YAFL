@@ -56,11 +56,15 @@ class Collector(Flask):
             self.mailer = mailer.Mailer(
                 queue=self.queue, daemon=True, **mailconf, logger=self.logger
             )
+        if self.mailer:
+            self.logger.debug("Starting the mailer in a separate thread...")
+            self.mailer.start()
+            self.logger.debug("Mailer thread started.")
 
     def init_db(self):
         try:
             self.db = TinyDB(self.db_path)
-            self.logger.info("db init'd")
+            self.logger.info("db init'd (%s)", self.db_path)
         except IOError:
             self.logger.error("db init failed")
             raise ConfigError
@@ -91,10 +95,6 @@ class Collector(Flask):
         self.client_timemap[client_ip].last_contact = datetime.datetime.now()
 
     def run(self, *args, **kwargs):
-        if self.mailer:
-            self.logger.debug("Starting the mailer in a separate thread...")
-            self.mailer.start()
-            self.logger.debug("Mailer thread started.")
         super().run(
             host=self.address,
             port=self.port,
