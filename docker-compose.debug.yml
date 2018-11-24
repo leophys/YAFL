@@ -1,9 +1,11 @@
 version: "3.6"
 services:
     yafl:
+        environment:
+            - "YAFL_APP_LOG_LEVEL=DEBUG"
         volumes:
             - .:/home/johndoe/app
-            - ./utils/yafl.yaml:/etc/yafl.yaml:ro
+            - ./utils/yafl.yaml:/home/johndoe/.yafl.yaml:ro
         ports:
             - "8000:8000"
             - "1717:1717"

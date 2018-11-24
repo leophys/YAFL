@@ -1,0 +1,11 @@
+---
+app:
+    db_path: '/var/log/yafl_test.json'
+    log_level: 'DEBUG'
+mail:
+    address: 'mail.example.com'
+    username: 'me@example.com'
+    password: 'password!'
+    from_field: 'yafl@example.com'
+    to_field: 'other.me@sample.net'
+    starttls: true
