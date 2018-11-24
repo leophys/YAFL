@@ -6,3 +6,4 @@ uwsgi:
     plugins: python3
     module: yafl.uwsgi_mod
     callable: yafl
+    enable-threads: true
