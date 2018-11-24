@@ -111,6 +111,18 @@ def cast_to_int(value: str) -> int:
     return int(value)
 
 
+def parse_loglevel(level: str) -> int:
+    """
+    Given a debug level in input, outputs the corresponding
+    integer.
+    """
+    try:
+        int_level = int(level)
+    except ValueError:
+        int_level = getattr(logging, level)
+    return int_level
+
+
 def parse_timeout(timeout: str) -> datetime.timedelta:
     """
     Given an input string with units, outputs a corresponding timedelta
@@ -146,6 +158,7 @@ def validate_conf(conf: dict)-> None:
         raise ValueError("Malformed ip address: %s" % conf['app']['address'])
     if conf['app']['port'] <= 0 or conf['app']['port'] >= 2**16:
         raise ValueError("Malformed port: %s" % conf['app']['port'])
+    conf['app']['log_level'] = parse_loglevel(conf['app']['log_level'])
     # Mailer-specific part
     if conf['mail']:
         mailconf = conf['mail']
